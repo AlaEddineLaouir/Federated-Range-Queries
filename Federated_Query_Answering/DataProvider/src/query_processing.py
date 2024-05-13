@@ -70,6 +70,30 @@ def __range_on_index__(index_query:Dict[str,np.array]) ->str:
         conditions.append(condition)
     return " and ".join(conditions)
 
+def get_data(sql_db,dataset_name,columns,target):
+    cnx = Connection(sql_db)
+    cur = cnx.conn.cursor()
+
+    query = sql_data.get_data(dataset_name,columns,target)
+    cur.execute(query)
+
+    rows = cur.fetchall()
+    X =[]
+    y=[]
+    for row in rows:
+        X.append(list(row[:-1]))
+        y.append(int(row[-1]))
+    return X,y
+def _size_database_(sql_db,dataset):
+    cnx = Connection(sql_db)
+    cur = cnx.conn.cursor()
+    
+    query_strata = sql_data.__size__(dataset)
+    cur.execute(query_strata)
+    x = cur.fetchone()[0]
+    
+
+    return x
 
 def __one_table_query__(sql_db,dataset:str,operator:str,query:Dict[str,np.array]):
     sql_range = __range_to_sql__(query)
@@ -137,6 +161,7 @@ def __get_clusters__(sql_db,dataset:str,query:Dict[str,np.array],index_query:Dic
     num_,weight_ = __strata_weight_with_inclusion_probability(sql_db,dataset,rows,query)
     return num_,weight_
     
+
 
 
 def __sampling__(sql_db,dataset_name,operator,nums,weights,query,epsilon,allocation,delta_p):

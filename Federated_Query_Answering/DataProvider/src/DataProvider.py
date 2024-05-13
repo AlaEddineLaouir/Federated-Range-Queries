@@ -163,11 +163,11 @@ class Data_Provider:
     
     
 
-    def __get_smooth_sensitivity_estimator_2__(self,dataset_name,epsilon,operator,est_s,R_s,A_s,D):
+    def __get_smooth_sensitivity_estimator_2__(self,dataset_name,epsilon,operator,est_s,R_s,A_s,D,gamma):
         
         u = 1
         
-        gamma = 0.001
+        # gamma = 0.001
         beta = epsilon/(2* np.log(2/gamma))
 
         N_Q = len(self.weights)
@@ -381,8 +381,23 @@ class Data_Provider:
         mpc.run(mpc.shutdown())
         time_ext_2 = time_ext_2 - time()
     
+    
     @Pyro5.api.expose
-    def __ARQP__(self,dataset_name,operator,query,epsilon):
+    def get_data(self,dataset_name,columns,target):
+        X,y = qp.get_data(self.sql_db,dataset_name,columns,target)
+        return self.id,X,y
+    
+    @Pyro5.api.expose
+    def __get_data_size__(self,dataset_name,epsilon):
+        try:
+            res = qp._size_database_(self.sql_db,dataset_name)
+        except Exception as e: 
+            print(e)
+            # input()
+            print("Here")
+        return  self.id,res + np.random.laplace(0,1/epsilon)
+    @Pyro5.api.expose
+    def __ARQP__(self,dataset_name,operator,query,epsilon,gamma=10^-3):
         
         D = len(query)
         
@@ -395,7 +410,7 @@ class Data_Provider:
             est,est_s,R_s,A_s = qp.__sampling__(self.sql_db,dataset_name,operator,self.nums,self.weights,query,epsilon*self.em_ratio,self.allocation,delta_p)
             
             epsilon = self.lap_ratio*epsilon
-            smooth_sensitivity = self.__get_smooth_sensitivity_estimator_2__(dataset_name,epsilon,operator,est_s,R_s,A_s,D)
+            smooth_sensitivity = self.__get_smooth_sensitivity_estimator_2__(dataset_name,epsilon,operator,est_s,R_s,A_s,D,gamma)
             scale = 2*smooth_sensitivity/epsilon
             res_dp = est+ np.random.laplace(0,scale)
             return self.id,res_dp,est

@@ -25,6 +25,15 @@ def __aggregate_in_temp__(name:str,dims_names:str)->str:
         select """+dims_names+""", count(*) as agg_count from """+name+"""  
         group by ("""+dims_names+""");
         """
+def get_data(name,columns,target):
+    cols =""
+    for c in columns:
+        cols = cols + str(c)+ ","
+    cols = cols + str(target)
+    return "select DISTINCT " + cols + " from " + name +"_temp ;"
+def __size__(name:str) ->str:
+    return "select count(*) from "+name+" ;"
+
 def __aggregate_and_sort_by_count_in_temp__(name:str,dims_names:str)->str:
     return """insert into """+name+"""_temp ("""+dims_names+""",agg_count)
         select """+dims_names+""", count(*) as agg_count from """+name+"""  

@@ -1,6 +1,7 @@
 # Private Approximate Query over Horizontal Data Federation (Submitted  in EDBT 2025)
 
 Our approach has two parties: the Aggregator and Data Providers. The code related to each party is in different folders.
+We will show you how to lunch the test, and the Learning Based Attack we presented in our work.
 
 ### Our Approach Overview (Using only DP):
 
@@ -65,6 +66,21 @@ Our approach has two parties: the Aggregator and Data Providers. The code relate
     python3 src/DataProvider.py "database name" 0 127.0.0.1 -M5  -I1
     ```
     To this command you give it the database name you associated to the data provider, the second parameter indicates the id '0' of data provider in our system. You give it the IP address of the data provider machine. The last two are associated to the SMC framework(MyPC): "-M5" indicates the number of participants "-I1" indicates the id of the participant to MyPC.
+
+### Our Approach Overview Resilience to Learning Based Attacks:
+To lunch this experiment, you follow the same steps as presented for 'Our Approach Overview (Using only DP)' for data providers bu for the Aggregator:
+##### Installation Steps for Aggregator (Resilience to Learning Based Attacks Tests):
+1. Run the following commands to create a virtual environment for Python:
+    ```
+    cd Aggregator
+    ./install_dependencies.sh
+    ```
+3. On a machine, launch the Aggregator using the following command:
+    ```
+    cd Aggregator
+    ./lunch_nb_learn.sh 4 SequentialCOUNT
+    ```
+    The number '4' indicates how many data providers you have. the second parameter indicate which budget management/query to use: SequentialCOUNT, SequentialSUM ,AdvancedCOUNT, AdvancedSUM, CoalitionCOUNT, CoalitionSUM 
 
 
 
